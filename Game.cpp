@@ -1,5 +1,6 @@
 #include "Engine.h"
 #include "Draw.h"
+#include "Player.h"
 #include <stdlib.h>
 #include <memory.h>
 
@@ -15,10 +16,11 @@
 //  clear_buffer() - set all pixels in buffer to 'black'
 //  is_window_active() - returns true if window is active
 //  schedule_quit_game() - quit game after act()
-
+Player* player;
 // initialize game data in this function
 void initialize()
 {
+  player = new Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 }
 int a = 0, b = 0;
 // this function is called to update game data,
@@ -27,22 +29,14 @@ void act(float dt)
 {
   if (is_key_pressed(VK_ESCAPE))
     schedule_quit_game();
-  if (is_key_pressed('A'))
-    a--;
-  if (is_key_pressed('D'))
-    a++;
+  if (is_key_pressed(VK_LEFT) || is_key_pressed('A'))
+    player->turn_left(dt);
+  if (is_key_pressed(VK_RIGHT) || is_key_pressed('D'))
+    player->turn_right(dt);
   if (is_key_pressed('W'))
-    b--;
-  if (is_key_pressed('S'))
-    b++;
-  if (a == SCREEN_WIDTH)
-    a = 0;
-  else if (a == -1)
-    a = SCREEN_WIDTH - 1;
-  if (b == SCREEN_HEIGHT)
-    b = 0;
-  else if (b == -1)
-    b = SCREEN_HEIGHT - 1;
+    player->thrust(dt);
+
+  player->flying(dt);
 }
 
 // fill buffer in this function
@@ -56,6 +50,7 @@ void draw()
   draw_thick_line(350, 400, 300, 380, 0xffff00, 2);
   draw_thick_line(300, 380, 250, 400, 0xffff00, 2);
   draw_dot(a, b, 0xffff00, 10);
+  player->draw();
   //draw_thick_line(300, 500, 320, 320, 0xffff00, 10);
 
   //draw_dot(50, 50, 0xffff00, 10);
