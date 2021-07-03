@@ -2,8 +2,10 @@
 #include "Draw.h"
 #include "Player.h"
 #include "Bullet.h"
+#include "Asteroid.h"
 #include <stdlib.h>
 #include <memory.h>
+#include <time.h>
 
 //
 //  You are free to modify this file
@@ -19,12 +21,17 @@
 //  schedule_quit_game() - quit game after act()
 static Player* player;
 static vector<Bullet> bullets;
+static vector<Asteroid> asteroids;
 // initialize game data in this function
 void initialize()
 {
+  srand(time(0));
   player = new Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+  asteroids.push_back(Asteroid({ 100, 100 }, 2, 50, 3));
+  asteroids.push_back(Asteroid({ 1004, 100 }, 4, 50, 1));
+  asteroids.push_back(Asteroid({ 1004, 700 }, 5, 50, 2));
 }
-int a = 0, b = 0;
+
 // this function is called to update game data,
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt)
@@ -48,6 +55,10 @@ void act(float dt)
   {
     bullet.update(dt);
   }
+  for (auto& asteroid : asteroids)
+  {
+    asteroid.update(dt);
+  }
   
   for (auto it = bullets.begin(); it != bullets.end();)
   {
@@ -68,12 +79,15 @@ void draw()
   draw_thick_line(300, 300, 250, 400, 0xffff00, 2);
   draw_thick_line(350, 400, 300, 380, 0xffff00, 2);
   draw_thick_line(300, 380, 250, 400, 0xffff00, 2);
-  draw_dot(a, b, 0xffff00, 10);
   player->draw();
   //draw_thick_line(300, 500, 320, 320, 0xffff00, 10);
   for (auto& bullet : bullets)
   {
     bullet.draw();
+  }
+  for (auto& asteroid : asteroids)
+  {
+    asteroid.draw();
   }
   //draw_dot(50, 50, 0xffff00, 10);
   //draw_line(300, 300, 500, 300, 0xff0000);

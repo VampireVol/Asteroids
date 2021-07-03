@@ -1,7 +1,6 @@
 #pragma once
 #include "Draw.h"
 #include "IMovable.h"
-#include <math.h>
 
 class Bullet : IMovable
 {

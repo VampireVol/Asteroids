@@ -1,4 +1,5 @@
 #include "Bullet.h"
+#include <math.h>
 
 Bullet::Bullet(const Point &position, float angle, float speed)
 	: IMovable(position, { sinf(angle) * speed, -cosf(angle) * speed }, angle)
