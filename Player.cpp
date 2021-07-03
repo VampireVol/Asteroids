@@ -1,9 +1,10 @@
 #include "Engine.h"
 #include "Player.h"
 #include "Draw.h"
+#include <iostream>
 
 Player::Player(float x, float y)
-	: _position({ x, y }), _velocity({ 0, 0 }), _angle(0)
+	: IMovable({ x, y }, { 0, 0 }, 0)
 {
 	_ship_points.push_back({ 0, -50 });
 	_ship_points.push_back({ 30, 30 });
@@ -20,8 +21,10 @@ void Player::draw()
 	{
 		int j = i + 1;
 		draw_thick_line(
-			_draw_points[i % size].x + _position.x, _draw_points[i % size].y + _position.y,
-			_draw_points[j % size].x + _position.x, _draw_points[j % size].y + _position.y, 
+			static_cast<int>(_draw_points[i % size].x + _position.x), 
+			static_cast<int>(_draw_points[i % size].y + _position.y),
+			static_cast<int>(_draw_points[j % size].x + _position.x),
+			static_cast<int>(_draw_points[j % size].y + _position.y),
 			0xffff00, 3);
 	}
 }
@@ -70,24 +73,6 @@ float Player::get_angle()
 	return _angle;
 }
 
-void Player::move(float dt)
-{
-	_position.x += _velocity.x * dt;
-	_position.y += _velocity.y * dt;
-
-	//_velocity.x *= 0.9999f * (1 - dt);
-	//_velocity.y *= 0.9999f * (1 - dt);
-
-	if (_position.x >= SCREEN_WIDTH)
-		_position.x = 0;
-	else if (_position.x < 0)
-		_position.x = SCREEN_WIDTH - 1;
-	if (_position.y >= SCREEN_HEIGHT)
-		_position.y = 0;
-	else if (_position.y < 0)
-		_position.y = SCREEN_HEIGHT - 1;
-}
-
 void Player::reloading(float dt)
 {
 	if (!is_reloaded())
@@ -96,7 +81,7 @@ void Player::reloading(float dt)
 
 void Player::rotate_points()
 {
-	int size = _ship_points.size();
+	auto size = _ship_points.size();
 	for (int i = 0; i < size; ++i)
 	{
 		_draw_points[i].x = _ship_points[i].x * cosf(_angle) - _ship_points[i].y * sinf(_angle);

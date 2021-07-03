@@ -1,11 +1,11 @@
 #pragma once
 #include "Point.h"
-
+#include "IMovable.h"
 #include <vector>
 
 using std::vector;
 
-class Player
+class Player : public IMovable
 {
 public:
 	Player(float x, float y);
@@ -19,9 +19,6 @@ public:
   Point get_shoot_pos();
   float get_angle();
 private:
-	Point _position;
-	Point _velocity;
-	float _angle;
 	vector<Point> _ship_points;
 	vector<Point> _draw_points;
 	vector<Point> _collision_points;
@@ -29,7 +26,6 @@ private:
 	float _cur_reloading_time = 0.0f;
 
 	void rotate_points();
-	void move(float dt);
 	void reloading(float dt);
 };
 

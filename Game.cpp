@@ -17,8 +17,8 @@
 //  clear_buffer() - set all pixels in buffer to 'black'
 //  is_window_active() - returns true if window is active
 //  schedule_quit_game() - quit game after act()
-Player* player;
-vector<Bullet> bullets;
+static Player* player;
+static vector<Bullet> bullets;
 // initialize game data in this function
 void initialize()
 {
