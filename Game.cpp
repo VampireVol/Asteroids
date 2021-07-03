@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Draw.h"
 #include "Player.h"
+#include "Bullet.h"
 #include <stdlib.h>
 #include <memory.h>
 
@@ -17,6 +18,7 @@
 //  is_window_active() - returns true if window is active
 //  schedule_quit_game() - quit game after act()
 Player* player;
+vector<Bullet> bullets;
 // initialize game data in this function
 void initialize()
 {
@@ -33,10 +35,27 @@ void act(float dt)
     player->turn_left(dt);
   if (is_key_pressed(VK_RIGHT) || is_key_pressed('D'))
     player->turn_right(dt);
-  if (is_key_pressed('W'))
+  if (is_key_pressed(VK_UP) || is_key_pressed('W'))
     player->thrust(dt);
+  if (is_key_pressed(VK_SPACE) && player->is_reloaded())
+  {
+    player->reload();
+    bullets.push_back(Bullet(player->get_shoot_pos(), player->get_angle(), 300.0f));
+  }
 
-  player->flying(dt);
+  player->update(dt);
+  for (auto &bullet : bullets)
+  {
+    bullet.update(dt);
+  }
+  
+  for (auto it = bullets.begin(); it != bullets.end();)
+  {
+    if ((*it).is_lifetime_over())
+      it = bullets.erase(it);
+    else
+      ++it;
+  }
 }
 
 // fill buffer in this function
@@ -52,7 +71,10 @@ void draw()
   draw_dot(a, b, 0xffff00, 10);
   player->draw();
   //draw_thick_line(300, 500, 320, 320, 0xffff00, 10);
-
+  for (auto& bullet : bullets)
+  {
+    bullet.draw();
+  }
   //draw_dot(50, 50, 0xffff00, 10);
   //draw_line(300, 300, 500, 300, 0xff0000);
   //draw_line(200, 200, 100, 200);
@@ -62,5 +84,6 @@ void draw()
 // free game data in this function
 void finalize()
 {
+  delete player;
 }
 

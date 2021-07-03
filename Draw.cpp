@@ -2,8 +2,21 @@
 #include "Engine.h"
 #include <math.h>
 
+void recalc_pixel_position(int& x, int& y)
+{
+  if (x >= SCREEN_WIDTH)
+    x -= SCREEN_WIDTH;
+  else if (x < 0)
+    x += SCREEN_WIDTH;
+  if (y >= SCREEN_HEIGHT)
+    y -= SCREEN_HEIGHT;
+  else if (y < 0)
+    y += SCREEN_HEIGHT;
+}
+
 void set_pixel(int x, int y, int color)
 {
+  recalc_pixel_position(x, y);
   if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
     buffer[y][x] = color;
 }
