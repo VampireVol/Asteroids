@@ -6,12 +6,16 @@
 Player::Player(float x, float y)
 	: IMovable({ x, y }, { 0, 0 }, 0)
 {
-	_ship_points.push_back({ 0, -50 });
-	_ship_points.push_back({ 30, 30 });
-	_ship_points.push_back({ 0, 10 });
-	_ship_points.push_back({ -30, 30 });
+	_ship_points.push_back({ 0, -30 });
+	_ship_points.push_back({ 20, 20 });
+	_ship_points.push_back({ 0, 15 });
+	_ship_points.push_back({ -20, 20 });
 	for (int i = 0; i < _ship_points.size(); ++i)
+	{
 		_draw_points.push_back(_ship_points[i]);
+		_global_points.push_back(_ship_points[i]);
+	}
+		
 }
 
 void Player::draw()
@@ -44,6 +48,11 @@ void Player::turn_left(float dt)
 void Player::update(float dt)
 {
 	move(dt);
+	for (int i = 0; i < _global_points.size(); ++i)
+	{
+		_global_points[i].x = _draw_points[i].x + _position.x;
+		_global_points[i].y = _draw_points[i].y + _position.y;
+	}
 	reloading(dt);
 }
 
@@ -58,9 +67,21 @@ bool Player::is_reloaded()
 	return _cur_reloading_time <= 0.0f;
 }
 
+bool Player::is_alive()
+{
+	return lifes > 0;
+}
+
 void Player::reload()
 {
 	_cur_reloading_time = _reloading_time;
+}
+
+void Player::destroyed()
+{
+	--lifes;
+	_position.x = 500;
+	_position.y = 500;
 }
 
 Point Player::get_shoot_pos()
@@ -68,9 +89,9 @@ Point Player::get_shoot_pos()
 	return { _draw_points[0].x + _position.x, _draw_points[0].y + _position.y };
 }
 
-float Player::get_angle()
+const vector<Point>& Player::get_global_points()
 {
-	return _angle;
+	return _global_points;
 }
 
 void Player::reloading(float dt)

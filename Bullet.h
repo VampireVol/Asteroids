@@ -9,7 +9,8 @@ public:
 	void draw();
 	void update(float dt);
 	bool is_lifetime_over();
+	Point get_position();
 private:
-	float _lifetime = 5.0f;
+	float _lifetime = 3.0f;
 };
 

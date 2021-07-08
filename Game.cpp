@@ -19,17 +19,27 @@
 //  clear_buffer() - set all pixels in buffer to 'black'
 //  is_window_active() - returns true if window is active
 //  schedule_quit_game() - quit game after act()
+
 static Player* player;
 static vector<Bullet> bullets;
 static vector<Asteroid> asteroids;
+
+float rand(float min, float max) 
+{
+    float answer = static_cast<float>(rand()) / RAND_MAX;
+    return min + answer * (max - min);
+}
+
 // initialize game data in this function
 void initialize()
 {
   srand(time(0));
   player = new Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
   asteroids.push_back(Asteroid({ 100, 100 }, 2, 50, 3));
-  asteroids.push_back(Asteroid({ 1004, 100 }, 4, 50, 1));
-  asteroids.push_back(Asteroid({ 1004, 700 }, 5, 50, 2));
+  asteroids.push_back(Asteroid({ 1004, 100 }, 4, 50, 3));
+  asteroids.push_back(Asteroid({ 1004, 700 }, 5, 50, 3));
+  asteroids.push_back(Asteroid({ 504, 100 }, 4, 50, 3));
+  asteroids.push_back(Asteroid({ 204, 700 }, 5, 50, 3));
 }
 
 // this function is called to update game data,
@@ -59,6 +69,33 @@ void act(float dt)
   {
     asteroid.update(dt);
   }
+
+  for (int i = 0; i < bullets.size(); ++i)
+  {
+    for (int j = 0; i < bullets.size() && j < asteroids.size(); ++j)
+    {
+      if (asteroids[j].is_collided({ bullets[i].get_position() }))
+      {
+        float angle = asteroids[j].get_angle();
+        int size = asteroids[j].get_size();
+        if (size > 1)
+        {
+          asteroids.push_back(Asteroid({ asteroids[j].get_position(), rand(angle + pi() * 0.25, angle + pi() * 0.75), 50, size - 1 }));
+          asteroids.push_back(Asteroid({ asteroids[j].get_position(), rand(angle - pi() * 0.25, angle - pi() * 0.75), 50, size - 1 }));
+        }
+        asteroids.erase(asteroids.begin() + j);
+        bullets.erase(bullets.begin() + i--);
+        break;
+      }
+    }
+  }
+  for (int i = 0; i < asteroids.size(); ++i)
+  {
+    if (asteroids[i].is_collided(player->get_global_points()))
+    {
+      player->destroyed();
+    }
+  }
   
   for (auto it = bullets.begin(); it != bullets.end();)
   {
@@ -75,12 +112,8 @@ void draw()
 {
   // clear backbuffer
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
-  draw_thick_line(300, 300, 350, 400, 0xffff00, 2);
-  draw_thick_line(300, 300, 250, 400, 0xffff00, 2);
-  draw_thick_line(350, 400, 300, 380, 0xffff00, 2);
-  draw_thick_line(300, 380, 250, 400, 0xffff00, 2);
-  player->draw();
-  //draw_thick_line(300, 500, 320, 320, 0xffff00, 10);
+  if (player->is_alive())
+    player->draw();
   for (auto& bullet : bullets)
   {
     bullet.draw();
@@ -89,10 +122,6 @@ void draw()
   {
     asteroid.draw();
   }
-  //draw_dot(50, 50, 0xffff00, 10);
-  //draw_line(300, 300, 500, 300, 0xff0000);
-  //draw_line(200, 200, 100, 200);
-  //buffer[500][1000] = 0xff0000;
 }
 
 // free game data in this function

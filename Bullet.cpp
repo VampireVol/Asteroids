@@ -22,3 +22,8 @@ bool Bullet::is_lifetime_over()
 {
 	return _lifetime < 0.0f;
 }
+
+Point Bullet::get_position()
+{
+	return _position;
+}

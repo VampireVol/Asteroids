@@ -1,5 +1,7 @@
 #pragma once
+#include <math.h>
 
+float pi();
 void recalc_pixel_position(int& x, int& y);
 void set_pixel(int x, int y, int color = 0xffffff);
 void draw_dot(int x, int y, int color, int thickness = 1);

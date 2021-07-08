@@ -2,6 +2,11 @@
 #include "Engine.h"
 #include <math.h>
 
+float pi()
+{
+  return atan(1) * 4;
+}
+
 void recalc_pixel_position(int& x, int& y)
 {
   if (x >= SCREEN_WIDTH)

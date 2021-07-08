@@ -15,15 +15,18 @@ public:
 	void update(float dt);
 	void thrust(float dt);
 	bool is_reloaded();
+	bool is_alive();
 	void reload();
+	void destroyed();
   Point get_shoot_pos();
-  float get_angle();
+  const vector<Point>& get_global_points();
 private:
 	vector<Point> _ship_points;
 	vector<Point> _draw_points;
-	vector<Point> _collision_points;
-	const float _reloading_time = 0.1f;
+	vector<Point> _global_points;
+	const float _reloading_time = 0.2f;
 	float _cur_reloading_time = 0.0f;
+	int lifes = 3;
 
 	void rotate_points();
 	void reloading(float dt);

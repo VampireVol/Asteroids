@@ -7,6 +7,16 @@ IMovable::IMovable(const Point& position, const Point& velocity, float angle)
 
 }
 
+float IMovable::get_angle()
+{
+	return _angle;
+}
+
+Point IMovable::get_position()
+{
+	return _position;
+}
+
 void IMovable::move(float dt)
 {
 	_position.x += _velocity.x * dt;
