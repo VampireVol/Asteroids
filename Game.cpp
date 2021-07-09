@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Bullet.h"
 #include "Asteroid.h"
+#include "Score.h"
 #include <stdlib.h>
 #include <memory.h>
 #include <time.h>
@@ -21,6 +22,7 @@
 //  schedule_quit_game() - quit game after act()
 
 static Player* player;
+static Score score;
 static vector<Bullet> bullets;
 static vector<Asteroid> asteroids;
 
@@ -83,6 +85,7 @@ void act(float dt)
           asteroids.push_back(Asteroid({ asteroids[j].get_position(), rand(angle + pi() * 0.25, angle + pi() * 0.75), 50, size - 1 }));
           asteroids.push_back(Asteroid({ asteroids[j].get_position(), rand(angle - pi() * 0.25, angle - pi() * 0.75), 50, size - 1 }));
         }
+        score.add_score(100 * size);
         asteroids.erase(asteroids.begin() + j);
         bullets.erase(bullets.begin() + i--);
         break;
@@ -112,6 +115,7 @@ void draw()
 {
   // clear backbuffer
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
+  //Objects
   if (player->is_alive())
     player->draw();
   for (auto& bullet : bullets)
@@ -122,6 +126,9 @@ void draw()
   {
     asteroid.draw();
   }
+  //GUI
+  score.draw();
+  player->draw_lifes();
 }
 
 // free game data in this function
@@ -129,4 +136,3 @@ void finalize()
 {
   delete player;
 }
-

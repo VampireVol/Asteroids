@@ -61,7 +61,8 @@ bool Asteroid::is_collided(const vector<Point> points)
 			if ((((_global_points[i].y <= point.y) && (point.y < _global_points[j].y)) ||
 				((_global_points[j].y <= point.y) && (point.y < _global_points[i].y))) &&
 				(((_global_points[j].y - _global_points[i].y) != 0) &&
-					(point.x > ((_global_points[j].x - _global_points[i].x) * (point.y - _global_points[i].y) / (_global_points[j].y - _global_points[i].y) + _global_points[i].x))))
+					(point.x > ((_global_points[j].x - _global_points[i].x) * (point.y - _global_points[i].y) /
+						(_global_points[j].y - _global_points[i].y) + _global_points[i].x))))
 				answer = !answer;
 		}
 		if (answer)

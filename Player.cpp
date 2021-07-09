@@ -33,6 +33,23 @@ void Player::draw()
 	}
 }
 
+void Player::draw_lifes()
+{
+	Point start{ 10, 80 };
+	int padding = 15;
+	int height = 50;
+	int width = 40;
+	int color = 0xffff00;
+	int thickness = 3;
+	for (int i = 0; i < lifes; ++i)
+	{
+		draw_thick_line(start.x + i * (width + padding) + 0.5f * width, start.y, start.x + i * (width + padding) + width, start.y + height, color, thickness);
+		draw_thick_line(start.x + i * (width + padding) + 0.5f * width, start.y, start.x + i * (width + padding), start.y + height, color, thickness);
+		draw_thick_line(start.x + i * (width + padding) + 0.5f * width, start.y + 0.9f * height, start.x + i * (width + padding) + width, start.y + height, color, thickness);
+		draw_thick_line(start.x + i * (width + padding) + 0.5f * width, start.y + 0.9f * height, start.x + i * (width + padding), start.y + height, color, thickness);
+	}
+}
+
 void Player::turn_right(float dt)
 {
 	_angle += 2.0f * dt;

@@ -10,6 +10,7 @@ class Player : public IMovable
 public:
 	Player(float x, float y);
 	void draw();
+	void draw_lifes();
 	void turn_right(float dt);
 	void turn_left(float dt);
 	void update(float dt);
