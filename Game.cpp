@@ -25,11 +25,21 @@ static Player* player;
 static Score score;
 static vector<Bullet> bullets;
 static vector<Asteroid> asteroids;
+static bool pause = false;
+static float pause_timer = -1.0f;
 
 float rand(float min, float max) 
 {
     float answer = static_cast<float>(rand()) / RAND_MAX;
     return min + answer * (max - min);
+}
+
+void reset()
+{
+    player->reset();
+    score.reset();
+    asteroids.clear();
+    bullets.clear();
 }
 
 // initialize game data in this function
@@ -48,6 +58,21 @@ void initialize()
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt)
 {
+  if (is_key_pressed('P') && pause_timer < 0)
+  {
+    pause = !pause;
+    pause_timer = 0.5f;
+  }
+  if (pause_timer > 0)
+    pause_timer -= dt;
+  if (pause)
+    return;
+
+  if (player->is_thrust())
+    player->set_thrust(false);
+
+  if (is_key_pressed(VK_RETURN))
+    reset();
   if (is_key_pressed(VK_ESCAPE))
     schedule_quit_game();
   if (is_key_pressed(VK_LEFT) || is_key_pressed('A'))
@@ -92,7 +117,7 @@ void act(float dt)
       }
     }
   }
-  for (int i = 0; i < asteroids.size(); ++i)
+  for (int i = 0; i < asteroids.size() && !player->is_invulnerability(); ++i)
   {
     if (asteroids[i].is_collided(player->get_global_points()))
     {
@@ -116,8 +141,10 @@ void draw()
   // clear backbuffer
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
   //Objects
-  if (player->is_alive())
+  if (player->is_alive() && !player->is_flicker())
+  {
     player->draw();
+  }
   for (auto& bullet : bullets)
   {
     bullet.draw();
