@@ -6,9 +6,9 @@ Asteroid::Asteroid(const Point& position, float angle, float speed, int size, in
   _size(size), _radius(size* _step_radius), _health(size), _start_color(color), _color(color),
   _start_points(10, { 0, 0 }), _draw_points(10, { 0, 0 }), _global_points(10, { 0, 0 })
 {
-  float angle_step = 2 * pi() / 10;
-  float angle_cur = angle_step;
   auto n = _start_points.size();
+  float angle_step = 2 * pi() / n;
+  float angle_cur = angle_step;
   for (int i = 0; i < n; ++i)
   {
     float radius = (static_cast<float>(rand()) / RAND_MAX * 0.4f + 0.8f) * _radius;
