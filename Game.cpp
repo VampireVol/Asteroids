@@ -27,19 +27,70 @@ static vector<Bullet> bullets;
 static vector<Asteroid> asteroids;
 static bool pause = false;
 static float pause_timer = -1.0f;
+static float next_level_timer = -1.0f;
+static float difficult = 1.0f;
 
-float rand(float min, float max) 
+float rand(float min, float max)
 {
-    float answer = static_cast<float>(rand()) / RAND_MAX;
-    return min + answer * (max - min);
+  float answer = static_cast<float>(rand()) / RAND_MAX;
+  return min + answer * (max - min);
+}
+
+void generate_level()
+{
+  vector<int> asteroids_colors{ 0xffffff, 0x0000ff, 0x000077,
+      0x00ff00, 0x007700, 0x999999, 0x8b00ff, 0x964b00 };
+  int asteroids_count = static_cast<int>(10 * difficult);
+  for (int i = 0; i < asteroids_count; ++i)
+  {
+    float random = rand(0.0f, 1.0f);
+    float x = 0, y = 0;
+    if (random >= 0.0f && random < 0.25f)
+    {
+      x = rand(0, SCREEN_WIDTH);
+      y = rand(0, SCREEN_HEIGHT * 0.2f);
+    }
+    else if (random >= 0.25f && random < 0.5f)
+    {
+      x = rand(SCREEN_WIDTH * 0.8f, SCREEN_WIDTH);
+      y = rand(0, SCREEN_HEIGHT);
+    }
+    else if (random >= 0.5f && random < 0.75f)
+    {
+      x = rand(0, SCREEN_WIDTH);
+      y = rand(SCREEN_HEIGHT * 0.8f, SCREEN_HEIGHT);
+    }
+    else if (random >= 0.75f && random <= 1.0f)
+    {
+      x = rand(0, SCREEN_WIDTH * 0.2f);
+      y = rand(0, SCREEN_HEIGHT);
+    }
+    asteroids.push_back(Asteroid(
+      { x, y },
+      rand(0, 2 * pi()),
+      rand(50, 100) * difficult,
+      rand() % 3 + 1,
+      asteroids_colors[rand() % asteroids_colors.size()]
+    ));
+  }
+}
+
+void generate_next_level()
+{
+  player->reset_position();
+  bullets.clear();
+  difficult += 0.2f;
+  generate_level();
 }
 
 void reset()
 {
-    player->reset();
-    score.reset();
-    asteroids.clear();
-    bullets.clear();
+  player->reset();
+  score.reset();
+  asteroids.clear();
+  bullets.clear();
+  difficult = 1.0f;
+  generate_level();
 }
 
 // initialize game data in this function
@@ -47,11 +98,7 @@ void initialize()
 {
   srand(time(0));
   player = new Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-  asteroids.push_back(Asteroid({ 100, 100 }, 2, 50, 3));
-  asteroids.push_back(Asteroid({ 1004, 100 }, 4, 50, 3));
-  asteroids.push_back(Asteroid({ 1004, 700 }, 5, 50, 3));
-  asteroids.push_back(Asteroid({ 504, 100 }, 4, 50, 3));
-  asteroids.push_back(Asteroid({ 204, 700 }, 5, 50, 3));
+  generate_level();
 }
 
 // this function is called to update game data,
@@ -67,6 +114,15 @@ void act(float dt)
     pause_timer -= dt;
   if (pause)
     return;
+
+  if (next_level_timer > 0)
+  {
+    next_level_timer -= dt;
+    if (next_level_timer <= 0)
+      generate_next_level();
+  }
+  if (asteroids.empty() && next_level_timer < 0)
+    next_level_timer = 3.0f;
 
   if (player->is_thrust())
     player->set_thrust(false);
@@ -88,7 +144,7 @@ void act(float dt)
   }
 
   player->update(dt);
-  for (auto &bullet : bullets)
+  for (auto& bullet : bullets)
   {
     bullet.update(dt);
   }
@@ -103,15 +159,27 @@ void act(float dt)
     {
       if (asteroids[j].is_collided({ bullets[i].get_position() }))
       {
-        float angle = asteroids[j].get_angle();
-        int size = asteroids[j].get_size();
-        if (size > 1)
+        asteroids[j].get_damage();
+        if (asteroids[j].is_destroyed())
         {
-          asteroids.push_back(Asteroid({ asteroids[j].get_position(), rand(angle + pi() * 0.25, angle + pi() * 0.75), 50, size - 1 }));
-          asteroids.push_back(Asteroid({ asteroids[j].get_position(), rand(angle - pi() * 0.25, angle - pi() * 0.75), 50, size - 1 }));
+          float angle = asteroids[j].get_angle();
+          int size = asteroids[j].get_size();
+          int color = asteroids[j].get_color();
+          if (size > 1)
+          {
+            asteroids.push_back(Asteroid(asteroids[j].get_position(),
+              rand(angle + pi() * 0.25f, angle + pi() * 0.75f),
+              rand(50, 100) * difficult, size - 1, color));
+            asteroids.push_back(Asteroid(asteroids[j].get_position(),
+              rand(angle - pi() * 0.25f, angle - pi() * 0.75f),
+              rand(50, 100) * difficult, size - 1, color));
+          }
+          int old = score.get_score() / 10000;
+          score.add_score(100 * size);
+          int last = score.get_score() / 10000;
+          if (old != last) player->add_life();
+          asteroids.erase(asteroids.begin() + j);
         }
-        score.add_score(100 * size);
-        asteroids.erase(asteroids.begin() + j);
         bullets.erase(bullets.begin() + i--);
         break;
       }
@@ -124,7 +192,7 @@ void act(float dt)
       player->destroyed();
     }
   }
-  
+
   for (auto it = bullets.begin(); it != bullets.end();)
   {
     if ((*it).is_lifetime_over())
