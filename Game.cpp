@@ -131,16 +131,19 @@ void act(float dt)
     reset();
   if (is_key_pressed(VK_ESCAPE))
     schedule_quit_game();
-  if (is_key_pressed(VK_LEFT) || is_key_pressed('A'))
-    player->turn_left(dt);
-  if (is_key_pressed(VK_RIGHT) || is_key_pressed('D'))
-    player->turn_right(dt);
-  if (is_key_pressed(VK_UP) || is_key_pressed('W'))
-    player->thrust(dt);
-  if (is_key_pressed(VK_SPACE) && player->is_reloaded())
+  if (player->is_alive())
   {
-    player->reload();
-    bullets.push_back(Bullet(player->get_shoot_pos(), player->get_angle(), 300.0f));
+    if (is_key_pressed(VK_LEFT) || is_key_pressed('A'))
+      player->turn_left(dt);
+    if (is_key_pressed(VK_RIGHT) || is_key_pressed('D'))
+      player->turn_right(dt);
+    if (is_key_pressed(VK_UP) || is_key_pressed('W'))
+      player->thrust(dt);
+    if (is_key_pressed(VK_SPACE) && player->is_reloaded())
+    {
+      player->reload();
+      bullets.push_back(Bullet(player->get_shoot_pos(), player->get_angle(), 300.0f));
+    }
   }
 
   player->update(dt);
@@ -185,7 +188,7 @@ void act(float dt)
       }
     }
   }
-  for (int i = 0; i < asteroids.size() && !player->is_invulnerability(); ++i)
+  for (int i = 0; i < asteroids.size() && !player->is_invulnerability() && player->is_alive(); ++i)
   {
     if (asteroids[i].is_collided(player->get_global_points()))
     {
