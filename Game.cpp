@@ -5,6 +5,7 @@
 #include "Asteroid.h"
 #include "Score.h"
 #include "Logo.h"
+#include "Controller.h"
 #include <stdlib.h>
 #include <memory.h>
 #include <time.h>
@@ -22,8 +23,9 @@
 //  is_window_active() - returns true if window is active
 //  schedule_quit_game() - quit game after act()
 
-static Player* player;
-static Logo *logo;
+static Player* player = nullptr;
+static Logo* logo = nullptr;
+static Controller* controller = nullptr;
 static Score score;
 static vector<Bullet> bullets;
 static vector<Asteroid> asteroids;
@@ -98,12 +100,26 @@ void reset()
   generate_level();
 }
 
+Controller* try_find_controller()
+{
+  for (int i = 0; i < 3; ++i)
+  {
+    Controller* c = new Controller(i);
+    if (c->isConnected())
+      return c;
+    else
+      delete c;
+  }
+  return nullptr;
+}
+
 // initialize game data in this function
 void initialize()
 {
   srand(time(0));
   player = new Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
   logo = new Logo({ SCREEN_WIDTH / 2 - 480, SCREEN_HEIGHT / 2 - 80 });
+  controller = try_find_controller();
   generate_level();
 }
 
@@ -121,6 +137,14 @@ void act(float dt)
         logo_shade = true;
       }
     }
+    for (int i = 0; i < 7; ++i)
+    {
+      if (controller && controller->is_key_pressed(i))
+      {
+        start = true;
+        logo_shade = true;
+      }
+    }
   }
   else if (logo_shade)
     logo->update(dt);
@@ -130,7 +154,9 @@ void act(float dt)
     reset();
   }
 
-  if (is_key_pressed('P') && pause_timer < 0)
+  if ((is_key_pressed('P') ||
+    (controller && controller->is_key_pressed(GP_PAUSE)))
+    && pause_timer < 0)
   {
     pause = !pause;
     pause_timer = 0.5f;
@@ -152,19 +178,26 @@ void act(float dt)
   if (player->is_thrust())
     player->set_thrust(false);
 
-  if (is_key_pressed(VK_RETURN))
+  if (is_key_pressed(VK_RETURN) ||
+    (controller && controller->is_key_pressed(GP_RESTART)))
     reset();
-  if (is_key_pressed(VK_ESCAPE))
+  if (is_key_pressed(VK_ESCAPE) ||
+    (controller && controller->is_key_pressed(GP_EXIT)))
     schedule_quit_game();
   if (player->is_alive())
   {
-    if (is_key_pressed(VK_LEFT) || is_key_pressed('A'))
+    if (is_key_pressed(VK_LEFT) || is_key_pressed('A') ||
+      (controller && controller->is_key_pressed(GP_TURN_LEFT)))
       player->turn_left(dt);
-    if (is_key_pressed(VK_RIGHT) || is_key_pressed('D'))
+    if (is_key_pressed(VK_RIGHT) || is_key_pressed('D') ||
+      (controller && controller->is_key_pressed(GP_TURN_RIGHT)))
       player->turn_right(dt);
-    if (is_key_pressed(VK_UP) || is_key_pressed('W'))
+    if (is_key_pressed(VK_UP) || is_key_pressed('W') ||
+      (controller && controller->is_key_pressed(GP_THRUST)))
       player->thrust(dt);
-    if (is_key_pressed(VK_SPACE) && player->is_reloaded())
+    if ((is_key_pressed(VK_SPACE) ||
+      (controller && controller->is_key_pressed(GP_SHOOT))) &&
+      player->is_reloaded())
     {
       player->reload();
       bullets.push_back(Bullet(player->get_shoot_pos(), player->get_angle(), 450.0f));
@@ -196,11 +229,11 @@ void act(float dt)
           if (size > 1)
           {
             asteroids.push_back(Asteroid(asteroids[j].get_position(),
-              rand(angle + pi() * 0.25f, angle + pi() * 0.75f), 
+              rand(angle + pi() * 0.25f, angle + pi() * 0.75f),
               rand(50, 100) * difficult,
               rand(-1.5f, 1.5f), size - 1, color));
             asteroids.push_back(Asteroid(asteroids[j].get_position(),
-              rand(angle - pi() * 0.25f, angle - pi() * 0.75f), 
+              rand(angle - pi() * 0.25f, angle - pi() * 0.75f),
               rand(50, 100) * difficult,
               rand(-1.5f, 1.5f), size - 1, color));
           }
@@ -240,7 +273,7 @@ void draw()
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
   if ((!start || logo_shade) && logo->is_half_color())
     logo->draw();
-  
+
   //Objects
   if (player->is_alive() && !player->is_flicker())
   {
@@ -267,4 +300,6 @@ void finalize()
 {
   delete player;
   delete logo;
+  if (controller)
+    delete controller;
 }
