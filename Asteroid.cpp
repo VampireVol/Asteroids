@@ -43,7 +43,7 @@ void Asteroid::update(float dt)
 void Asteroid::get_damage()
 {
   --_health;
-  shade_color(-20);
+  _color = shade_color(_color, -20);
 }
 
 bool Asteroid::is_collided(const vector<Point>& points)
@@ -92,21 +92,4 @@ void Asteroid::update_points()
     _global_points[i].x = _draw_points[i].x + _position.x;
     _global_points[i].y = _draw_points[i].y + _position.y;
   }
-}
-
-void Asteroid::shade_color(int amount)
-{
-  int r = (_color >> 16) & 0xff;
-  int g = (_color >> 8) & 0xff;
-  int b = _color & 0xff;
-
-  r = static_cast<int>(r * (100.0f + amount) / 100);
-  g = static_cast<int>(g * (100.0f + amount) / 100);
-  b = static_cast<int>(b * (100.0f + amount) / 100);
-
-  if (r > 255) r = 255;
-  if (g > 255) g = 255;
-  if (b > 255) b = 255;
-
-  _color = (r << 16) | (g << 8) | b;
 }

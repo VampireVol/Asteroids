@@ -149,6 +149,7 @@
     <ClInclude Include="Draw.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="IMovable.h" />
+    <ClInclude Include="Logo.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Score.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="IMovable.cpp" />
+    <ClCompile Include="Logo.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Score.cpp" />
   </ItemGroup>

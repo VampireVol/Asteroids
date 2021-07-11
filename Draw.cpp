@@ -78,3 +78,20 @@ void draw_thick_line(int x0, int y0, int x1, int y1, int color, int thickness)
     draw_line(x0 + i, y0, x1 + i, y1, color);
   }
 }
+
+int shade_color(int color, int amount)
+{
+  int r = (color >> 16) & 0xff;
+  int g = (color >> 8) & 0xff;
+  int b = color & 0xff;
+
+  r = static_cast<int>(r * (100.0f + amount) / 100);
+  g = static_cast<int>(g * (100.0f + amount) / 100);
+  b = static_cast<int>(b * (100.0f + amount) / 100);
+
+  if (r > 255) r = 255;
+  if (g > 255) g = 255;
+  if (b > 255) b = 255;
+
+  return (r << 16) | (g << 8) | b;
+}

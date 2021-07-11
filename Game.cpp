@@ -4,6 +4,7 @@
 #include "Bullet.h"
 #include "Asteroid.h"
 #include "Score.h"
+#include "Logo.h"
 #include <stdlib.h>
 #include <memory.h>
 #include <time.h>
@@ -22,11 +23,13 @@
 //  schedule_quit_game() - quit game after act()
 
 static Player* player;
+static Logo *logo;
 static Score score;
 static vector<Bullet> bullets;
 static vector<Asteroid> asteroids;
 static bool pause = false;
 static bool start = false;
+static bool logo_shade = false;
 static float pause_timer = -1.0f;
 static float next_level_timer = -1.0f;
 static float difficult = 1.0f;
@@ -100,6 +103,7 @@ void initialize()
 {
   srand(time(0));
   player = new Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+  logo = new Logo({ SCREEN_WIDTH / 2 - 480, SCREEN_HEIGHT / 2 - 80 });
   generate_level();
 }
 
@@ -114,10 +118,18 @@ void act(float dt)
       if (is_key_pressed(i))
       {
         start = true;
-        reset();
+        logo_shade = true;
       }
     }
   }
+  else if (logo_shade)
+    logo->update(dt);
+  if (logo_shade && logo->is_shaded())
+  {
+    logo_shade = false;
+    reset();
+  }
+
   if (is_key_pressed('P') && pause_timer < 0)
   {
     pause = !pause;
@@ -226,6 +238,9 @@ void draw()
 {
   // clear backbuffer
   memset(buffer, 0, SCREEN_HEIGHT * SCREEN_WIDTH * sizeof(uint32_t));
+  if ((!start || logo_shade) && logo->is_half_color())
+    logo->draw();
+  
   //Objects
   if (player->is_alive() && !player->is_flicker())
   {
@@ -240,8 +255,10 @@ void draw()
     asteroid.draw();
   }
   //GUI
-  if (start)
+  if (start && !logo_shade)
     score.draw();
+  if ((!start || logo_shade) && !logo->is_half_color())
+    logo->draw();
   player->draw_lifes();
 }
 
@@ -249,4 +266,5 @@ void draw()
 void finalize()
 {
   delete player;
+  delete logo;
 }

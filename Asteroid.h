@@ -28,6 +28,5 @@ private:
   vector<Point> _global_points;
 
   void update_points();
-  void shade_color(int amount);
 };
 
