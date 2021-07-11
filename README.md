@@ -12,6 +12,7 @@ Size | Hits for destruction | Score
 Large | 3 | 300
 Medium | 2 | 200
 Small | 1 | 100
+
 When hit by an asteroid, its boundaries darken. When a large or medium asteroid is destroyed, two smaller asteroids appear in place of the destroyed one.
 ## Control
 - W or Up arrow - thrust
@@ -26,5 +27,5 @@ When hit by an asteroid, its boundaries darken. When a large or medium asteroid 
 1. Download last [build](https://github.com/VampireVol/Asteroids/releases)
 2. Extract .zip archive
 3. Execute GameTemplate.exe
-## Build infromation
+## Build information
 Build tools: Visual Studio 2019 (v142)
