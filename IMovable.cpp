@@ -1,5 +1,6 @@
 #include "IMovable.h"
 #include "Engine.h"
+#include <math.h>
 
 IMovable::IMovable(const Point& position, const Point& velocity, float angle)
   : _position(position), _velocity(velocity), _angle(angle)
@@ -10,6 +11,11 @@ IMovable::IMovable(const Point& position, const Point& velocity, float angle)
 float IMovable::get_angle()
 {
   return _angle;
+}
+
+float IMovable::get_speed()
+{
+  return sqrt(_velocity.x * _velocity.x + _velocity.y * _velocity.y);
 }
 
 Point IMovable::get_position()

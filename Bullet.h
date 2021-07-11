@@ -11,6 +11,6 @@ public:
   bool is_lifetime_over();
   Point get_position();
 private:
-  float _lifetime = 3.0f;
+  float _lifetime = 2.0f;
 };
 

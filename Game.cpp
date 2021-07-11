@@ -26,6 +26,7 @@ static Score score;
 static vector<Bullet> bullets;
 static vector<Asteroid> asteroids;
 static bool pause = false;
+static bool start = false;
 static float pause_timer = -1.0f;
 static float next_level_timer = -1.0f;
 static float difficult = 1.0f;
@@ -38,8 +39,9 @@ float rand(float min, float max)
 
 void generate_level()
 {
-  vector<int> asteroids_colors{ 0xffffff, 0x0000ff, 0x000077,
-      0x00ff00, 0x007700, 0x999999, 0x8b00ff, 0x964b00 };
+  vector<int> asteroids_colors{ 0xffffff, 0x0000ff, 0x00d9e0,
+      0x00ff00, 0x009900, 0x999999, 0x8b00ff, 0x964b00,
+      0xac00e0, 0x00ffbf, 0xffb700, 0xc3ff00, 0xc2c2c2 };
   int asteroids_count = static_cast<int>(10 * difficult);
   for (int i = 0; i < asteroids_count; ++i)
   {
@@ -48,27 +50,28 @@ void generate_level()
     if (random >= 0.0f && random < 0.25f)
     {
       x = rand(0, SCREEN_WIDTH);
-      y = rand(0, SCREEN_HEIGHT * 0.2f);
+      y = rand(0, SCREEN_HEIGHT * 0.15f);
     }
     else if (random >= 0.25f && random < 0.5f)
     {
-      x = rand(SCREEN_WIDTH * 0.8f, SCREEN_WIDTH);
+      x = rand(SCREEN_WIDTH * 0.85f, SCREEN_WIDTH);
       y = rand(0, SCREEN_HEIGHT);
     }
     else if (random >= 0.5f && random < 0.75f)
     {
       x = rand(0, SCREEN_WIDTH);
-      y = rand(SCREEN_HEIGHT * 0.8f, SCREEN_HEIGHT);
+      y = rand(SCREEN_HEIGHT * 0.85f, SCREEN_HEIGHT);
     }
     else if (random >= 0.75f && random <= 1.0f)
     {
-      x = rand(0, SCREEN_WIDTH * 0.2f);
+      x = rand(0, SCREEN_WIDTH * 0.15f);
       y = rand(0, SCREEN_HEIGHT);
     }
     asteroids.push_back(Asteroid(
       { x, y },
       rand(0, 2 * pi()),
       rand(50, 100) * difficult,
+      rand(-1.5f, 1.5f),
       rand() % 3 + 1,
       asteroids_colors[rand() % asteroids_colors.size()]
     ));
@@ -77,7 +80,6 @@ void generate_level()
 
 void generate_next_level()
 {
-  player->reset_position();
   bullets.clear();
   difficult += 0.2f;
   generate_level();
@@ -105,6 +107,17 @@ void initialize()
 // dt - time elapsed since the previous update (in seconds)
 void act(float dt)
 {
+  if (!start)
+  {
+    for (int i = 0; i < 256; ++i)
+    {
+      if (is_key_pressed(i))
+      {
+        start = true;
+        reset();
+      }
+    }
+  }
   if (is_key_pressed('P') && pause_timer < 0)
   {
     pause = !pause;
@@ -122,7 +135,7 @@ void act(float dt)
       generate_next_level();
   }
   if (asteroids.empty() && next_level_timer < 0)
-    next_level_timer = 3.0f;
+    next_level_timer = 5.0f;
 
   if (player->is_thrust())
     player->set_thrust(false);
@@ -142,7 +155,7 @@ void act(float dt)
     if (is_key_pressed(VK_SPACE) && player->is_reloaded())
     {
       player->reload();
-      bullets.push_back(Bullet(player->get_shoot_pos(), player->get_angle(), 300.0f));
+      bullets.push_back(Bullet(player->get_shoot_pos(), player->get_angle(), 450.0f));
     }
   }
 
@@ -171,11 +184,13 @@ void act(float dt)
           if (size > 1)
           {
             asteroids.push_back(Asteroid(asteroids[j].get_position(),
-              rand(angle + pi() * 0.25f, angle + pi() * 0.75f),
-              rand(50, 100) * difficult, size - 1, color));
+              rand(angle + pi() * 0.25f, angle + pi() * 0.75f), 
+              rand(50, 100) * difficult,
+              rand(-1.5f, 1.5f), size - 1, color));
             asteroids.push_back(Asteroid(asteroids[j].get_position(),
-              rand(angle - pi() * 0.25f, angle - pi() * 0.75f),
-              rand(50, 100) * difficult, size - 1, color));
+              rand(angle - pi() * 0.25f, angle - pi() * 0.75f), 
+              rand(50, 100) * difficult,
+              rand(-1.5f, 1.5f), size - 1, color));
           }
           int old = score.get_score() / 10000;
           score.add_score(100 * size);
@@ -225,7 +240,8 @@ void draw()
     asteroid.draw();
   }
   //GUI
-  score.draw();
+  if (start)
+    score.draw();
   player->draw_lifes();
 }
 

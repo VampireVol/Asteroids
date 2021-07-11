@@ -1,10 +1,11 @@
 #include "Draw.h"
 #include "Engine.h"
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 float pi()
 {
-  return atan(1) * 4;
+  return static_cast<float>(M_PI);
 }
 
 void recalc_pixel_position(int& x, int& y)

@@ -7,7 +7,7 @@ using std::vector;
 class Asteroid : public IMovable
 {
 public:
-  Asteroid(const Point& position, float angle, float speed, int size, int color);
+  Asteroid(const Point& position, float angle, float speed, float speed_rotation, int size, int color);
   void draw();
   void update(float dt);
   void get_damage();
@@ -17,6 +17,7 @@ public:
   int get_color();
 private:
   int _step_radius = 20;
+  float _speed_rotation;
   int _size;
   int _radius;
   int _health;

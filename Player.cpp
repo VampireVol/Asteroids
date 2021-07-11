@@ -79,13 +79,13 @@ void Player::draw_lifes()
 
 void Player::turn_right(float dt)
 {
-  _angle += 2.0f * dt;
+  _angle += _speed_rotation * dt;
   update_draw_points();
 }
 
 void Player::turn_left(float dt)
 {
-  _angle -= 2.0f * dt;
+  _angle -= _speed_rotation * dt;
   update_draw_points();
 }
 

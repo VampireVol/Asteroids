@@ -34,13 +34,14 @@ private:
   vector<Point> _global_points;
   vector<Point> _thrust_points;
   vector<Point> _draw_thrust_points;
-  float _reloading_time = 0.2f;
+  float _speed_rotation = 3.0f;
+  float _reloading_time = 0.15f;
   float _flicker_time = 0.75f;
-  float _invulnerability_time = 5.0f;
+  float _invulnerability_time = 7.0f;
   float _cur_reloading_time = 0.0f;
   float _cur_flicker_time = 0.0f;
   float _cur_invulnerability_time = 0.0f;
-  int _lifes = 3;
+  int _lifes = 0;
   bool _thrust = false;
 
   void update_draw_points();

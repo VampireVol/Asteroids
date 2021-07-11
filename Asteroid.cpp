@@ -1,9 +1,9 @@
 #include "Asteroid.h"
 #include "Draw.h"
 
-Asteroid::Asteroid(const Point& position, float angle, float speed, int size, int color)
-  : IMovable(position, { sinf(angle) * speed, -cosf(angle) * speed }, angle),
-  _size(size), _radius(size* _step_radius), _health(size), _start_color(color), _color(color),
+Asteroid::Asteroid(const Point& position, float angle, float speed, float speed_rotation, int size, int color)
+  : IMovable(position, { sinf(angle) * speed, -cosf(angle) * speed }, angle), 
+  _speed_rotation(speed_rotation), _size(size), _radius(size* _step_radius), _health(size), _start_color(color), _color(color),
   _start_points(10, { 0, 0 }), _draw_points(10, { 0, 0 }), _global_points(10, { 0, 0 })
 {
   auto n = _start_points.size();
@@ -36,7 +36,7 @@ void Asteroid::draw()
 void Asteroid::update(float dt)
 {
   move(dt);
-  _angle += 0.5f * dt;
+  _angle += _speed_rotation * dt;
   update_points();
 }
 
